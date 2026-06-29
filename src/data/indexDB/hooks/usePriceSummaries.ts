@@ -7,10 +7,8 @@ import compareObjectsBy from "@/utilities/compareObjectsBy"
 
 export default function usePriceSummaries(): Array<PriceSummary> | undefined {
   const priceSummaries = useLiveQuery(async () => {
-    return await db.priceSummaries?.toArray()
+    return await db.markets?.toArray() as any
   })
 
-  priceSummaries?.sort(compareObjectsBy("symbol"))
-
-  return priceSummaries
+  return priceSummaries ? [...priceSummaries].sort(compareObjectsBy("symbol")) : undefined
 }

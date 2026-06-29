@@ -63,16 +63,8 @@ export default function HomePage({ name = "HomePage", ...rest }: PropsWithChildr
   }
 
   const handleStartTrading = async () => {
-    if (marketsCount === loadedMarketsCount) {
-      await timerStart()
-      navigate("/prices")
-    } else {
-      const element = document?.getElementById(LOADALL_MODAL) as HTMLDialogElement
-
-      if (element) {
-        element.showModal()
-      }
-    }
+    await timerStart()
+    navigate("/prices")
   }
 
   useEffect(() => {
@@ -121,7 +113,7 @@ export default function HomePage({ name = "HomePage", ...rest }: PropsWithChildr
                 <div className="card-body">
                   <h4 className="card-title truncate">Markets</h4>
                   <div className="h-8 text-gray-500">
-                    <div>Take me back to 1979, and see how well you can grow a starting investment of $5,000</div>
+                    <div>Take me back to 1970, and see how well you can grow a starting investment of $5,000</div>
                     <div className="text-xs mt-4">
                       <span>As its not real money, you just hit this</span>
                       {/* <Link to="/reset"> */}
@@ -185,7 +177,7 @@ export default function HomePage({ name = "HomePage", ...rest }: PropsWithChildr
           {/* aside */}
           <div className="h-32 flex flex-col gap-4 justify-center items-center">
             <div className="flex flex-col gap-2 text-md font-extrabold leading-none tracking-tight text-gray-500 text-center">
-              <div>This is a game, set in 1979, and is not intended to be financial advice.</div>
+              <div>This is a game, set in 1970, and is not intended to be financial advice.</div>
               <div>There are no GDPR wavers as we don't use cookies, once loaded, the game runs locally.</div>
               <div className="font-light leading-none tracking-tight text-gray-500">
                 <span className="text-sm opacity-50">

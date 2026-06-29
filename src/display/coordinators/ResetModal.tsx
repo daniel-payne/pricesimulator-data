@@ -30,7 +30,7 @@ export default function ResetModal({ name = "ResetModal", children, ...rest }: P
         <div className="modal-box">
           <h3 className="text-error font-bold text-lg">Warning</h3>
           <p className="py-4">
-            You will lose all your trades and be taken back to 1979 with another <strong className="text-success">$5,000</strong> to start trading with.
+            You will lose all your trades and be taken back to 1970 with another <strong className="text-success">$5,000</strong> to start trading with.
           </p>
           <div className="modal-action">
             {/* if there is a button in form, it will close the modal */}

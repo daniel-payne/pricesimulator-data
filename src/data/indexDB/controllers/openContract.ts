@@ -7,6 +7,7 @@ import getTimer from "./getTimer"
 
 import getMarketForSymbol from "./getMarketForSymbol"
 import generateID from "@/utilities/generateID"
+import { controller as timerStart } from "./timerStart"
 
 import { DEFAULT_CONTRACT_COST } from "../constants/DEFAULT_CONTRACT_COST"
 
@@ -88,6 +89,7 @@ export async function controller(db: PriceSimulatorDexie, symbol: string, direct
       }
 
       await db.trades?.put(newContract)
+      await timerStart(db)
 
       return newContract
     }

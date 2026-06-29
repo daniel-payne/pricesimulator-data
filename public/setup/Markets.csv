@@ -1,67 +1,67 @@
-symbol,name,category,market,country,description,code,priceModifier,priceSize,priceSpread,priceDecimals,contractSize,contractUnit,contractName,baseCurrency,quoteCurrency,baseSymbol
-10USY.B,10y Treasury Note,bond,CME,US,US Government Bond,USD 10Y,1,,,3,100000,USD,one hundred thousand dollars,,USD,$
-30USY.B,30y Treasury Note,bond,CME,US,US Government Bond,USD 30Y,1,,,3,100000,USD,one hundred thousand dollars,,USD,$
-FV.F,5y Treasury Note,bond,CME,US,US Government Bond,USD 5Y,1,,,3,100000,USD,one hundred thousand dollars,,USD,$
-RS.F,Canola,commodity,CME,,,,1,1,,1,20,tonnes,half a  truck of oil,,USD,
-CC.F,Cocoa,commodity,CME,,,,1,1,,0,10,Metric Tons,a quarter of a truck of cocoa,,USD,
-KC.F,Coffee,commodity,CME,,,,0.01,1,,2,37500,lbs,one truck of coffee,,USD,
-C.F,Corn,commodity,CME,,,,0.01,1,,1,5000,bushels,five trucks of corn,,USD,
-CT.F,Cotton,commodity,CME,,,,0.01,1,,2,50000,lbs,one truck of cotton,,USD,
-CB.F,Crude Oil (Brent),commodity,CME,,,,1,1,,2,1000,Barrels,four and a half road tankers of oil,,USD,
-WI.F,Crude Oil (Light),commodity,CME,,,,1,1,,2,1000,Barrels,four and a half road tankers of oil,,USD,
-FC.F,Feeder cattle,commodity,CME,,,,0.01,1,,2,40000,lbs,one truck of calves,,USD,
-LF.F,Gas oil,commodity,CME,,,,1,1,,1,1000,Metric Tons,one truck of oil,,USD,
-RB.F,Gasoline,commodity,CME,,,,1,1,,4,42000,Gallons,one road tanker of gas,,USD,
-HO.F,Heating Oil,commodity,CME,,,,1,1,,4,42000,Gallons,one road tanker of oil,,USD,
-LH.F,Lean hogs,commodity,CME,,,,0.01,1,,2,40000,lbs,one truck of hogs,,USD,
-LC.F,Live cattle,commodity,CME,,,,0.01,1,,2,40000,lbs,one truck of cows,,USD,
-LB.F,Lumber,commodity,CME,,,,0.01,1000,,1,27500,board feet,one truck of wood,,USD,
-NF.F,Natural Gas,commodity,CME,,,,1,1,,2,10000,MMBtu,one road tanker of gas,,USD,
-OJ.F,Orange juice,commodity,CME,,,,0.01,1,,2,15000,lbs,half a  truck of juice,,USD,
-RR.F,Rough Rice,commodity,CME,,,,1,1,,2,2000,Hundredweights,two tones of rice,,USD,
-S.F,Soybean,commodity,CME,,,,0.01,1,,1,5000,bushels,three trucks of beans,,USD,
-SM.F,Soybean Meal,commodity,CME,,,,1,1,,1,100,Short tons,two trucks of meal,,USD,
-BO.F,Soybean Oil,commodity,CME,,,,0.01,1,,2,60000,lbs,one truck of soya oil,,USD,
-SB.F,Sugar,commodity,CME,,,,0.01,1,,2,112000,lbs,one truck of sugar,,USD,
-W.F,Wheat,commodity,CME,,,,0.01,1,,2,5000,bushels,three trucks of wheat,,USD,
-KW.F,Wheat (Hard red),commodity,CME,,,,0.01,1,,2,5000,bushels,three trucks of wheat,,USD,
-MW.F,Wheat (Spring),commodity,CME,,,,0.01,1,,2,5000,bushels,three trucks of wheat,,USD,
-AUDUSD,AUD/USD,currency,,,Australian Dollar,AUD/USD,,,,5,100000,Australian Dollars,"100,000 AU Dollars",AUD,USD,
-CADUSD,CAD/USD,currency,,,Canadian Dollar,CAD/USD,,,,4,100000,Canadian Dollars,"100,000 CA Dollars",CAD,USD,
-CHFUSD,CHF/USD,currency,,,Swiss Franc,CHF/USD,,,,5,50000,Swiss Francs,"50,000 Francs",CHF,USD,
-CZKUSD,CZK/USD,currency,,,Czech Koruna,CZK/USD,,,,7,100000,Czech Korunas,"100,000 Korunas",CZK,USD,
-DKKUSD,DKK/USD,currency,,,Danish Krone,DKK/USD,,,,5,10000,Danish Krones,"10,000 Krones",DDK,USD,
-EURUSD,EUR/USD,currency,,Eurozone,Euro,EUR/USD,,,,5,125000,Euros,"125,000 Euros",EUR,USD,€
-GBPUSD,GBP/USD,currency,,UK,Great British Pound,GBP/USD,,,,5,64000,Pounds,"64,000 Pounds Sterling",GBP,USD,£
-USDHKD,HKD/USD,currency,,,Hong Kong Dollar,HKD/USD,,,,4,100000,Hong Kong Dollar,"100,000 HK Dollars",HKD,USD,
-HUFUSD,HUF/USD,currency,,,Hungarian Forint,HUF/USD,,,,7,30000000,Hungarian Forints,"30,000,000 Forints",HUF,USD,
-JPYUSD,JPY/USD,currency,,,Japanese Yen,JPY/USD,,,,7,12500000,Yen,"12,500,00 Yen",JPY,USD,¥
-MXNUSD,MXN/USD,currency,,,Mexican Peso,MXN/USD,,,,7,500000,Mexican Peso,"500,000 Peso",MXN,USD,
-NOKUSD,NOK/USD,currency,,,Norwegian Krone,NOK/USD,,,,6,10000,Norwegian Krones,"10,000 Krones",NOK,USD,
-NZDUSD,NZD/USD,currency,,,New Zealand Dollar,NZD/USD,,,,5,100000,New Zealand Dollar,"100,000 NZ Dollar",NZD,USD,
-PLNUSD,PLN/USD,currency,,,Polish Zloty,PLN/USD,,,,5,500000,Polish Zloty,"500,000 Zloty",PLN,USD,
-SEKUSD,SEK/USD,currency,,,Swedish Krona,SEK/USD,,,,6,2000000,Swedish Krona,"2,000,000 Krona",SEK,USD,
-SGDUSD,SGD/USD,currency,,,Singapore Dollar,SGD/USD,,,,5,100000,Singapore Dollar,"100,000 SP Dollar",SGD,USD,
-TRYUSD,TRY/USD,currency,,,Turkish Lira,TRY/USD,,,,5,500000,Turkish Lira,"500,000 Lira",TRY,USD,₺
-ZARUSD,ZAR/USD,currency,,,South African Rand,ZAR/USD,,,,4,10000,South African Rand,"10,000 Rand",ZAR,USD,
-^CAC,CAC 40,index,,France,French stock market index,,,10,,2,,,movement in the index,,USD,
-^DAX,DAX,index,,Germany,German 40 major blue chip Index,,,25,,2,,,movement in the index,,USD,
-^DJI,Dow Jones,index,,US,US 30 Prominent Companies Index,,,5,,2,,,movement in the index,,USD,
-^UKX,FTSE 100,index,,UK,UK Top 250 Companies Index,,,10,,2,,,movement in the index,,USD,
-^FTM,FTSE 250,index,,UK,UK Top 100 Companies Index,,,1.25,,1,,,movement in the index,,USD,
-^HSI,HANG SENG,index,,Hong Kong,Hong Kong market-capitalization-weighted stock market index,,,6.5,,2,,,movement in the index,,USD,
-^IBEX,IBEX35,index,,Spain,Spanish stock market index,,,1,,1,,,movement in the index,,USD,
-^NDX,NASDAQ 100,index,,US,US Nasdaq stock exchange  100 of the largest non-financial companies,,,20,,2,,,movement in the index,,USD,
-^NKX,NIKKEI 225,index,,Japan,Tokyo Stock Exchange price-weighted index,,,6.5,,2,,,movement in the index,,USD,
-^SPX,S&P 500,index,,US,US 500 largest companies Index,,,50,,2,,,movement in the index,,USD,
-^STI,Straits Times,index,,Singapore,Singapore Top 30 companies Index,,,10,,2,,,movement in the index,,USD,
-CO_C.F,Cobalt,metal,,,,,1,,,0,1,Tonnes,a tonne,,USD,
-CA_C.F,Copper,metal,,,,,0.01,,,0,25000,lbs,one Truck of metal,,USD,
-GC.F,Gold,metal,,,,,1,1,0.04,1,100,Troy ounces,a quarter of a bar,,USD,
-PB_C.F,Lead,metal,,,,,1,,,0,25,Tonnes,one Truck of metal,,USD,
-NI_C.F,Nickel,metal,,,,,1,,,0,6,Tonnes,six tonnes,,USD,
-PA.F,Palladium,metal,,,,,1,,0.04,1,100,Troy ounces,a quarter of a bar,,USD,
-PL.F,Platinum,metal,,,,,1,,0.04,1,50,Troy ounces,fifty coins,,USD,
-SI.F,Silver,metal,,,,,0.01,,0.04,1,5000,Troy ounces,twelve bars of silver,,USD,
-SN_C.F,Tin,metal,,,,,1,,,0,5,Tonnes,five tonnes,,USD,
-ZS_C.F,Zinc,metal,,,,,1,,,,25,Metric Tons,one Truck of metal,,USD,
+symbol,name,category,market,country,description,code,priceModifier,priceSize,priceSpread,priceDecimals,contractSize,contractUnit,contractName,baseCurrency,quoteCurrency,baseSymbol,firstActiveIndex,lastActiveIndex
+10USY.B,10y Treasury Note,bond,CME,US,US Government Bond,USD 10Y,1,,,3,100000,USD,one hundred thousand dollars,,USD,$,1,19479
+30USY.B,30y Treasury Note,bond,CME,US,US Government Bond,USD 30Y,1,,,3,100000,USD,one hundred thousand dollars,,USD,$,1,19479
+FV.F,5y Treasury Note,bond,CME,US,US Government Bond,USD 5Y,1,,,3,100000,USD,one hundred thousand dollars,,USD,$,1,18746
+RS.F,Canola,commodity,CME,,,,1,1,,1,20,tonnes,half a  truck of oil,,USD,,1,18746
+CC.F,Cocoa,commodity,CME,,,,1,1,,0,10,Metric Tons,a quarter of a truck of cocoa,,USD,,1,18746
+KC.F,Coffee,commodity,CME,,,,0.01,1,,2,37500,lbs,one truck of coffee,,USD,,1,18746
+C.F,Corn,commodity,CME,,,,0.01,1,,1,5000,bushels,five trucks of corn,,USD,,1,18746
+CT.F,Cotton,commodity,CME,,,,0.01,1,,2,50000,lbs,one truck of cotton,,USD,,1,18746
+CB.F,Crude Oil (Brent),commodity,CME,,,,1,1,,2,1000,Barrels,four and a half road tankers of oil,,USD,,1,18746
+WI.F,Crude Oil (Light),commodity,CME,,,,1,1,,2,1000,Barrels,four and a half road tankers of oil,,USD,,1,18746
+FC.F,Feeder cattle,commodity,CME,,,,0.01,1,,2,40000,lbs,one truck of calves,,USD,,1,18746
+LF.F,Gas oil,commodity,CME,,,,1,1,,1,1000,Metric Tons,one truck of oil,,USD,,1,18746
+RB.F,Gasoline,commodity,CME,,,,1,1,,4,42000,Gallons,one road tanker of gas,,USD,,1,18746
+HO.F,Heating Oil,commodity,CME,,,,1,1,,4,42000,Gallons,one road tanker of oil,,USD,,1,18746
+LH.F,Lean hogs,commodity,CME,,,,0.01,1,,2,40000,lbs,one truck of hogs,,USD,,1,18746
+LC.F,Live cattle,commodity,CME,,,,0.01,1,,2,40000,lbs,one truck of cows,,USD,,1,18746
+LB.F,Lumber,commodity,CME,,,,0.01,1000,,1,27500,board feet,one truck of wood,,USD,,1,18745
+NF.F,Natural Gas,commodity,CME,,,,1,1,,2,10000,MMBtu,one road tanker of gas,,USD,,1,18746
+OJ.F,Orange juice,commodity,CME,,,,0.01,1,,2,15000,lbs,half a  truck of juice,,USD,,1,18746
+RR.F,Rough Rice,commodity,CME,,,,1,1,,2,2000,Hundredweights,two tones of rice,,USD,,1,18746
+S.F,Soybean,commodity,CME,,,,0.01,1,,1,5000,bushels,three trucks of beans,,USD,,1,18746
+SM.F,Soybean Meal,commodity,CME,,,,1,1,,1,100,Short tons,two trucks of meal,,USD,,1,18746
+BO.F,Soybean Oil,commodity,CME,,,,0.01,1,,2,60000,lbs,one truck of soya oil,,USD,,1,18746
+SB.F,Sugar,commodity,CME,,,,0.01,1,,2,112000,lbs,one truck of sugar,,USD,,1,18746
+W.F,Wheat,commodity,CME,,,,0.01,1,,2,5000,bushels,three trucks of wheat,,USD,,1,18746
+KW.F,Wheat (Hard red),commodity,CME,,,,0.01,1,,2,5000,bushels,three trucks of wheat,,USD,,1,18746
+MW.F,Wheat (Spring),commodity,CME,,,,0.01,1,,2,5000,bushels,three trucks of wheat,,USD,,1,18746
+AUDUSD,AUD/USD,currency,,,Australian Dollar,AUD/USD,,,,5,100000,Australian Dollars,"100,000 AU Dollars",AUD,USD,1,368,19479
+CADUSD,CAD/USD,currency,,,Canadian Dollar,CAD/USD,,,,4,100000,Canadian Dollars,"100,000 CA Dollars",CAD,USD,1,6220,19479
+CHFUSD,CHF/USD,currency,,,Swiss Franc,CHF/USD,,,,5,50000,Swiss Francs,"50,000 Francs",CHF,USD,1,368,19479
+CZKUSD,CZK/USD,currency,,,Czech Koruna,CZK/USD,,,,7,100000,Czech Korunas,"100,000 Korunas",CZK,USD,1,9426,19479
+DKKUSD,DKK/USD,currency,,,Danish Krone,DKK/USD,,,,5,10000,Danish Krones,"10,000 Krones",DDK,USD,1,6220,19479
+EURUSD,EUR/USD,currency,,Eurozone,Euro,EUR/USD,,,,5,125000,Euros,"125,000 Euros",EUR,USD,1,368,19479
+GBPUSD,GBP/USD,currency,,UK,Great British Pound,GBP/USD,,,,5,64000,Pounds,"64,000 Pounds Sterling",GBP,USD,1,368,19479
+USDHKD,HKD/USD,currency,,,Hong Kong Dollar,HKD/USD,,,,4,100000,Hong Kong Dollar,"100,000 HK Dollars",HKD,USD,1,6220,19479
+HUFUSD,HUF/USD,currency,,,Hungarian Forint,HUF/USD,,,,7,30000000,Hungarian Forints,"30,000,000 Forints",HUF,1,,9426,19479
+JPYUSD,JPY/USD,currency,,,Japanese Yen,JPY/USD,,,,7,12500000,Yen,"12,500,00 Yen",JPY,1,¥,368,19479
+MXNUSD,MXN/USD,currency,,,Mexican Peso,MXN/USD,,,,7,500000,Mexican Peso,"500,000 Peso",MXN,USD,1,7312,19479
+NOKUSD,NOK/USD,currency,,,Norwegian Krone,NOK/USD,,,,6,10000,Norwegian Krones,"10,000 Krones",NOK,USD,1,368,19479
+NZDUSD,NZD/USD,currency,,,New Zealand Dollar,NZD/USD,,,,5,100000,New Zealand Dollar,"100,000 NZ Dollar",NZD,USD,1,726,19479
+PLNUSD,PLN/USD,currency,,,Polish Zloty,PLN/USD,,,,5,500000,Polish Zloty,"500,000 Zloty",PLN,USD,1,6220,19479
+SEKUSD,SEK/USD,currency,,,Swedish Krona,SEK/USD,,,,6,2000000,Swedish Krona,"2,000,000 Krona",SEK,1,,368,19479
+SGDUSD,SGD/USD,currency,,,Singapore Dollar,SGD/USD,,,,5,100000,Singapore Dollar,"100,000 SP Dollar",SGD,USD,1,6220,19479
+TRYUSD,TRY/USD,currency,,,Turkish Lira,TRY/USD,,,,5,500000,Turkish Lira,"500,000 Lira",TRY,USD,1,6220,19479
+ZARUSD,ZAR/USD,currency,,,South African Rand,ZAR/USD,,,,4,10000,South African Rand,"10,000 Rand",ZAR,USD,1,6220,19479
+^CAC,CAC 40,index,,France,French stock market index,,,10,,2,,,movement in the index,,USD,,1,19479
+^DAX,DAX,index,,Germany,German 40 major blue chip Index,,,25,,2,,,movement in the index,,USD,,1,19479
+^DJI,Dow Jones,index,,US,US 30 Prominent Companies Index,,,5,,2,,,movement in the index,,USD,,1,19479
+^UKX,FTSE 100,index,,UK,UK Top 250 Companies Index,,,10,,2,,,movement in the index,,USD,,1,19479
+^FTM,FTSE 250,index,,UK,UK Top 100 Companies Index,,,1.25,,1,,,movement in the index,,USD,,1,19479
+^HSI,HANG SENG,index,,Hong Kong,Hong Kong market-capitalization-weighted stock market index,,,6.5,,2,,,movement in the index,,USD,,1,19479
+^IBEX,IBEX35,index,,Spain,Spanish stock market index,,,1,,1,,,movement in the index,,USD,,1,19479
+^NDX,NASDAQ 100,index,,US,US Nasdaq stock exchange  100 of the largest non-financial companies,,,20,,2,,,movement in the index,,USD,,1,19479
+^NKX,NIKKEI 225,index,,Japan,Tokyo Stock Exchange price-weighted index,,,6.5,,2,,,movement in the index,,USD,,1,19479
+^SPX,S&P 500,index,,US,US 500 largest companies Index,,,50,,2,,,movement in the index,,USD,,1,19479
+^STI,Straits Times,index,,Singapore,Singapore Top 30 companies Index,,,10,,2,,,movement in the index,,USD,,1,19479
+CO_C.F,Cobalt,metal,,,,,1,,,0,1,Tonnes,a tonne,,USD,,1,18746
+CA_C.F,Copper,metal,,,,,0.01,,,0,25000,lbs,one Truck of metal,,USD,,1,18746
+GC.F,Gold,metal,,,,,1,1,0.04,1,100,Troy ounces,a quarter of a bar,,USD,,1,18746
+PB_C.F,Lead,metal,,,,,1,,,0,25,Tonnes,one Truck of metal,,USD,,1,18746
+NI_C.F,Nickel,metal,,,,,1,,,0,6,Tonnes,six tonnes,,USD,,1,18746
+PA.F,Palladium,metal,,,,,1,,0.04,1,100,Troy ounces,a quarter of a bar,,USD,,1,18746
+PL.F,Platinum,metal,,,,,1,,0.04,1,50,Troy ounces,fifty coins,,USD,,1,18746
+SI.F,Silver,metal,,,,,0.01,,0.04,1,5000,Troy ounces,twelve bars of silver,,USD,,1,18746
+SN_C.F,Tin,metal,,,,,1,,,0,5,Tonnes,five tonnes,,USD,,1,18746
+ZS_C.F,Zinc,metal,,,,,1,,,,25,Metric Tons,one Truck of metal,,USD,,1,18746

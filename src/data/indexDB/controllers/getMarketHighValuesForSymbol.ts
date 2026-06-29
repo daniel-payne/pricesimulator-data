@@ -6,14 +6,14 @@ const CACHE: Record<string, any> = {}
 
 export async function controller(db: PriceSimulatorDexie, symbol: string) {
   if (CACHE[symbol] != null) {
-    return CACHE[symbol].data
+    return CACHE[symbol]
   }
 
-  const marketHighs = await db.marketHighs.get(symbol)
+  const highs = await db.highs.get(symbol)
 
-  CACHE[symbol] = marketHighs?.data
+  CACHE[symbol] = highs?.data
 
-  return marketHighs?.data
+  return highs?.data
 }
 
 export default function getMarketHighValuesForSymbol(symbol: string) {

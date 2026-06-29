@@ -15,10 +15,10 @@ export default function useActiveSymbols() {
 
   const { currentIndex } = timer
 
-  markets?.sort(compareObjectsBy("name"))
+  const sortedMarkets = markets ? [...markets].sort(compareObjectsBy("name")) : undefined
 
   if (currentIndex != null) {
-    const activeMarkets = markets?.filter((symbol) => symbol.firstActiveIndex <= currentIndex)
+    const activeMarkets = sortedMarkets?.filter((symbol) => symbol.firstActiveIndex <= currentIndex)
 
     const symbols = activeMarkets?.map((market) => market.symbol)
 

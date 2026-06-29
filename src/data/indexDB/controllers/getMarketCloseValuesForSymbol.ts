@@ -9,13 +9,13 @@ export async function controller(db: PriceSimulatorDexie, symbol: string) {
     return CACHE[symbol]
   }
 
-  const marketCloses = await db.marketCloses.get(symbol)
+  const closes = await db.closes.get(symbol)
 
-  CACHE[symbol] = marketCloses?.data
+  CACHE[symbol] = closes?.data
 
-  return marketCloses?.data
+  return closes?.data
 }
 
-export default function getMarketOpenValuesForSymbol(symbol: string) {
+export default function getMarketCloseValuesForSymbol(symbol: string) {
   return controller(db, symbol)
 }

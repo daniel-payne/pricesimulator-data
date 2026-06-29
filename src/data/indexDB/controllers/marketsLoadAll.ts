@@ -15,8 +15,13 @@ export async function controller(db: PriceSimulatorDexie) {
   consoleInfo(`marketsLoadAll: current db.markets count = ${count}`)
 
   if (count > 0) {
-    consoleInfo("marketsLoadAll: count > 0, skipping loading markets")
-    return
+    const firstMarket = await db.markets.limit(1).first()
+    const outdatedMarketsCount = await db.markets.filter(m => m.firstActiveIndex != null && m.firstActiveIndex > 1).count()
+    if (firstMarket && firstMarket.firstActiveIndex != null && outdatedMarketsCount === 0) {
+      consoleInfo("marketsLoadAll: count > 0 and firstActiveIndex is up-to-date, skipping loading markets")
+      return
+    }
+    consoleInfo(`marketsLoadAll: markets count > 0 but found ${outdatedMarketsCount} outdated markets. Re-loading markets...`)
   }
 
   const url = `/setup/Markets.csv`
@@ -53,6 +58,8 @@ export async function controller(db: PriceSimulatorDexie) {
     market.baseCurrency = market.baseCurrency === "" ? undefined : market.baseCurrency
     market.quoteCurrency = market.quoteCurrency === "" ? undefined : market.quoteCurrency
     market.baseSymbol = market.baseSymbol === "" ? undefined : market.baseSymbol
+    market.firstActiveIndex = market.firstActiveIndex ? Number.parseInt(market.firstActiveIndex) : undefined
+    market.lastActiveIndex = market.lastActiveIndex ? Number.parseInt(market.lastActiveIndex) : undefined
   }
 
   consoleInfo("marketsLoadAll: clearing db.markets table...")

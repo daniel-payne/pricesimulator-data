@@ -1,17 +1,13 @@
-import timerStart from "@/data/indexDB/controllers/timerStart"
 import timerStop from "@/data/indexDB/controllers/timerStop"
-import { ScenarioSpeed } from "@/data/indexDB/enums/ScenarioSpeed"
 import useScenarioFor from "@/data/indexDB/hooks/useScenarioFor"
 import timerUpdate from "@/data/indexDB/controllers/timerUpdate"
-
-import contractOpen from "@/data/indexDB/controllers/contractOpen"
+import preloadScenarioPrices from "@/data/indexDB/controllers/preloadScenarioPrices"
 
 import useFavoriteList from "@/data/localStorage/hooks/useFavoriteList"
 import useRangeSelection from "@/data/localStorage/hooks/useRangeSelection"
 import BalanceModal from "@/display/coordinators/BalanceModal"
 import SymbolManager from "@/display/coordinators/SymbolManager"
 import TradingFooter from "@/display/coordinators/TradingFooter"
-import TradingHeader from "@/display/coordinators/TradingHeader"
 import { Settings } from "@/display/Settings"
 import sizeForCount from "@/utilities/sizeForCount"
 import { useState, useEffect, type HTMLAttributes, type PropsWithChildren } from "react"
@@ -29,6 +25,7 @@ export default function ScenarioPage({ name = "ScenarioPage", ...rest }: PropsWi
   const { ref } = useParams()
 
   const [processError, setProcessError] = useState<any>(null)
+  const [pricesReady, setPricesReady] = useState(false)
 
   const scenario = useScenarioFor(ref)
 
@@ -38,18 +35,50 @@ export default function ScenarioPage({ name = "ScenarioPage", ...rest }: PropsWi
   const scenarioSymbols = scenario?.symbols?.split(",")
 
   useEffect(() => {
-    console.log("[TimerDebug] ScenarioPage useEffect mount - starting timer")
-    timerStart()
+    console.log("[TimerDebug] ScenarioPage mount - stopping timer initially")
+    timerStop(true)
+    return () => {
+      console.log("[TimerDebug] ScenarioPage unmount - stopping timer")
+      timerStop(true)
+    }
   }, [])
 
   useEffect(() => {
-    if (scenarioSymbols && scenarioSymbols.length > 0) {
-      timerUpdate({ activeSymbols: scenarioSymbols })
+    if (!scenarioSymbols?.length) {
+      setPricesReady(false)
+      return
+    }
+
+    let cancelled = false
+    setPricesReady(false)
+    timerUpdate({ activeSymbols: scenarioSymbols })
+
+    preloadScenarioPrices(scenarioSymbols).then(() => {
+      if (!cancelled) {
+        setPricesReady(true)
+      }
+    })
+
+    return () => {
+      cancelled = true
     }
   }, [scenarioSymbols?.join(",")])
 
-  if (scenario === undefined || scenarioSymbols === undefined) {
+  if (scenario === undefined) {
+    return <div>Loading scenario…</div>
+  }
+
+  if (scenarioSymbols === undefined) {
     return <div>No Scenario</div>
+  }
+
+  if (!pricesReady) {
+    return (
+      <div className="h-full w-full flex flex-col items-center justify-center gap-4">
+        <span className="loading loading-spinner loading-lg" />
+        <div className="text-base-content/60">Loading prices for {scenarioSymbols.join(", ")}…</div>
+      </div>
+    )
   }
 
   const scenarioSettings = JSON.parse(scenario?.settings ?? "{}")

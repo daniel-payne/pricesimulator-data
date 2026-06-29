@@ -194,8 +194,15 @@ db.on("versionchange", function () {
 
 console.log("[AppLog] db.ts: calling db.open() explicitly...")
 db.open()
-  .then(() => {
+  .then(async () => {
     console.log("[AppLog] db.ts: db.open() resolved successfully.")
+
+    const timer = await db.timer.limit(1).first()
+    if (timer?.isTimerActive === true) {
+      console.log("[AppLog] db.ts: resuming timer because isTimerActive is true")
+      const { controller: timerStart } = await import("./controllers/timerStart")
+      await timerStart(db)
+    }
   })
   .catch((err) => {
     console.error("[AppLog] db.ts: db.open() failed with error:", err)

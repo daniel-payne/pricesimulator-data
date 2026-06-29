@@ -11,7 +11,5 @@ export default function useScenarioData() {
     return await db.scenarios?.toArray()
   })
 
-  scenarios?.sort(compareObjectsBy("displayOrder"))
-
-  return scenarios
+  return scenarios ? [...scenarios].sort(compareObjectsBy("displayOrder")) : undefined
 }

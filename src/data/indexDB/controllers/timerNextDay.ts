@@ -14,6 +14,7 @@ import { controller as tradesCloseExpired } from "./tradesCloseExpired"
 
 import { controller as getTimer } from "./getTimer"
 import { controller as recalculateAll } from "./recalculateAll"
+import { controller as ohlcLoadFor } from "./ohlcLoadFor"
 
 // import recalculatePrices from "./recalculatePrices"
 // import recalculateMargins from "./recalculateMargins"
@@ -61,6 +62,20 @@ export async function controller(db: PriceSimulatorDexie, takeControl: boolean) 
       await updateTimer(db, { guid: db.guid, currentIndex, isTimerActive })
     } else {
       await updateTimer(db, { currentIndex: currentIndex })
+    }
+
+    // Pre-fetch check for next year on October 1st
+    const currentDate = new Date(currentIndex * 86400000)
+    const month = currentDate.getUTCMonth() // 9 is October
+    const day = currentDate.getUTCDate()
+    if (month === 9 && day === 1) {
+      const year = currentDate.getUTCFullYear()
+      const nextYear = year + 1
+      const markets = await db.markets.toArray()
+      for (const market of markets) {
+        console.log(`[TimerDebug] Pre-fetching next year (${nextYear}) data for market ${market.symbol}`)
+        ohlcLoadFor(db, market.symbol, nextYear)
+      }
     }
 
     await recalculateAll(db)

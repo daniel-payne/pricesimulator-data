@@ -5,6 +5,7 @@ import getTimer from "./getTimer"
 
 import getMarketForSymbol from "./getMarketForSymbol"
 import generateID from "@/utilities/generateID"
+import { controller as timerStart } from "./timerStart"
 
 import lastIndexOfMonth from "@/utilities/lastIndexOfMonth"
 import { TradeStatus } from "@/data/indexDB/enums/TradeStatus"
@@ -66,6 +67,7 @@ export async function controller(
       }
 
       await db.trades?.put(newContract)
+      await timerStart(db)
 
       return newContract
     }

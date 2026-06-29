@@ -4,111 +4,103 @@ import db from "@/data/indexDB/db"
 
 import type { PriceSimulatorDexie } from "@/data/indexDB/db"
 import marketUpdate from "./marketUpdate"
-
-const TIMEGAP_CUTOFF = 10
+import consoleInfo from "@/utilities/consoleInfo"
 
 const LOADING = {} as Record<string, boolean>
 
 const csvToObjectForPrices = (item: any) => {
-  if (!item["<DATE>"]) {
+  if (!item["date"]) {
     return
   }
 
-  const date = item["<DATE>"].substring(0, 4) + "-" + item["<DATE>"].substring(4, 6) + "-" + item["<DATE>"].substring(6, 8)
-
+  const date = item["date"]
   const index = Math.floor(new Date(date).getTime() / 1000 / 60 / 60 / 24)
 
   const data = {
     date,
     index,
-    open: Number.parseFloat(item["<OPEN>"]),
-    high: Number.parseFloat(item["<HIGH>"]),
-    low: Number.parseFloat(item["<LOW>"]),
-    close: Number.parseFloat(item["<CLOSE>"]),
-    volume: Number.parseFloat(item["<VOL>"]),
-    interest: Number.parseFloat(item["<OPENINT>"]),
+    open: Number.parseFloat(item["open"]),
+    high: Number.parseFloat(item["high"]),
+    low: Number.parseFloat(item["low"]),
+    close: Number.parseFloat(item["close"]),
+    volume: 0,
+    interest: 0,
   } as any
 
   return data
 }
 
-import consoleInfo from "@/utilities/consoleInfo"
-
-export async function controller(db: PriceSimulatorDexie, symbol: string | undefined) {
-  consoleInfo(`ohlcLoadFor: controller started for symbol = ${symbol}`)
+export async function controller(db: PriceSimulatorDexie, symbol: string | undefined, year?: number) {
+  const targetYear = year ?? 1970
+  const loadKey = `${symbol}_${targetYear}`
+  
+  consoleInfo(`ohlcLoadFor: controller started for symbol = ${symbol}, year = ${targetYear}`)
   if (symbol == null) {
     consoleInfo("ohlcLoadFor: symbol is null/undefined, returning early")
     return
   }
 
-  consoleInfo(`ohlcLoadFor: checking caches for ${symbol}...`)
-  const cachedOpens = db.opensCache[symbol]
-  const cachedHighs = db.highsCache[symbol]
-  const cachedLows = db.lowsCache[symbol]
-  const cachedCloses = db.closesCache[symbol]
-  const cachedVolatilities = db.volatilitiesCache[symbol]
-
-  if (cachedOpens != null && cachedHighs != null && cachedLows != null && cachedCloses != null && cachedVolatilities != null) {
-    consoleInfo(`ohlcLoadFor: caches found for ${symbol}, returning early`)
+  if (LOADING[loadKey] === true) {
+    consoleInfo(`ohlcLoadFor: already loading ${loadKey}, returning early`)
     return
   }
-
-  consoleInfo(`ohlcLoadFor: querying db for stored opens/highs/lows/closes/volatilities for ${symbol}...`)
-  const storedOpens = await db.opens.get(symbol)
-  const storedHighs = await db.highs.get(symbol)
-  const storedLows = await db.lows.get(symbol)
-  const storedCloses = await db.closes.get(symbol)
-  const storedVolatilities = await db.volatilities.get(symbol)
-  consoleInfo(`ohlcLoadFor: stored opens found? = ${storedOpens != null}, volatilities found? = ${storedVolatilities != null}`)
-
-  if (storedOpens != null && storedHighs != null && storedLows != null && storedCloses != null && storedVolatilities != null) {
-    consoleInfo(`ohlcLoadFor: storing retrieved db records into cache for ${symbol}`)
-    db.opensCache[symbol] = storedOpens.data
-    db.highsCache[symbol] = storedHighs.data
-    db.lowsCache[symbol] = storedLows.data
-    db.closesCache[symbol] = storedCloses.data
-    db.volatilitiesCache[symbol] = storedVolatilities.data
-
-    return
-  }
-
-  // if (LOADING[symbol] === true) {
-  //   LOADING[symbol] = false
-
-  //   return
-  // }
-
-  consoleInfo(`ohlcLoadFor: symbol ${symbol} not in cache/db. Fetching metadata from db.markets...`)
-  LOADING[symbol] = true
 
   const market = await db.markets.get(symbol)
-  consoleInfo(`ohlcLoadFor: retrieved market metadata from db for ${symbol}`, market)
+  consoleInfo(`ohlcLoadFor: retrieved market metadata from db for ${symbol}`)
 
   if (market?.symbol == null) {
     consoleInfo(`ohlcLoadFor: market symbol for ${symbol} not found in db.markets!`)
-    LOADING[symbol] = false
     return
   }
 
-  if (market?.firstActiveIndex != null) {
-    consoleInfo(`ohlcLoadFor: firstActiveIndex is already populated in db for ${symbol}, skipping fetch`)
-    LOADING[symbol] = false
+  const loadedYears = market.loadedYears ?? []
+  if (loadedYears.includes(targetYear)) {
+    consoleInfo(`ohlcLoadFor: year ${targetYear} already loaded for ${symbol}, skipping fetch`)
+    
+    // Ensure memory caches are populated if they are empty
+    const cachedOpens = db.opensCache[symbol]
+    if (cachedOpens == null) {
+      const storedOpens = await db.opens.get(symbol)
+      const storedHighs = await db.highs.get(symbol)
+      const storedLows = await db.lows.get(symbol)
+      const storedCloses = await db.closes.get(symbol)
+      const storedVolatilities = await db.volatilities.get(symbol)
+      
+      if (storedOpens && storedHighs && storedLows && storedCloses) {
+        db.opensCache[symbol] = storedOpens.data
+        db.highsCache[symbol] = storedHighs.data
+        db.lowsCache[symbol] = storedLows.data
+        db.closesCache[symbol] = storedCloses.data
+        if (storedVolatilities) {
+          db.volatilitiesCache[symbol] = storedVolatilities.data
+        }
+      }
+    }
     return
   }
 
-  const url = `/prices/${encodeURIComponent(market.symbol.toLowerCase())}.txt`
+  LOADING[loadKey] = true
+
+  const symbolLower = market.symbol.toLowerCase()
+  const url = `/prices/${encodeURIComponent(symbolLower)}/${encodeURIComponent(symbolLower)}_${targetYear}.csv`
   consoleInfo(`ohlcLoadFor: fetching price file from ${url}...`)
-  const response = await fetch(url, {})
-  consoleInfo(`ohlcLoadFor: fetch response status = ${response.status}, ok = ${response.ok}`)
-
-  if (response.ok === false) {
-    consoleInfo(`ohlcLoadFor: fetch failed for ${symbol}. status text: ${response.statusText}`)
-    LOADING[symbol] = false
-    return { error: response.statusText }
+  
+  let csv = ""
+  try {
+    const response = await fetch(url, {})
+    consoleInfo(`ohlcLoadFor: fetch response status = ${response.status}, ok = ${response.ok}`)
+    if (response.ok) {
+      csv = await response.text()
+    } else {
+      consoleInfo(`ohlcLoadFor: fetch failed for ${symbol} year ${targetYear}. status text: ${response.statusText}`)
+      LOADING[loadKey] = false
+      return { error: response.statusText }
+    }
+  } catch (err) {
+    console.error(`ohlcLoadFor: error fetching price file for ${symbol} year ${targetYear}:`, err)
+    LOADING[loadKey] = false
+    return
   }
-
-  const csv = await response.text()
-  consoleInfo(`ohlcLoadFor: csv text length = ${csv.length}`)
 
   const json = Papa.parse(csv, { header: true })
   consoleInfo(`ohlcLoadFor: parsed csv rows count = ${json.data?.length}`)
@@ -119,115 +111,117 @@ export async function controller(db: PriceSimulatorDexie, symbol: string | undef
     .filter((item) => item.index >= 0)
   consoleInfo(`ohlcLoadFor: filtered prices count = ${prices.length}`)
 
-  const opens = { symbol, data: Array(20000).fill(undefined) }
-  const highs = { symbol, data: Array(20000).fill(undefined) }
-  const lows = { symbol, data: Array(20000).fill(undefined) }
-  const closes = { symbol, data: Array(20000).fill(undefined) }
-  const volumes = { symbol, data: Array(20000).fill(undefined) }
-  const interests = { symbol, data: Array(20000).fill(undefined) }
+  // Retrieve existing arrays from DB or initialize
+  let storedOpens = await db.opens.get(symbol)
+  let storedHighs = await db.highs.get(symbol)
+  let storedLows = await db.lows.get(symbol)
+  let storedCloses = await db.closes.get(symbol)
+
+  if (!storedOpens) storedOpens = { symbol, data: Array(20000).fill(undefined) }
+  if (!storedHighs) storedHighs = { symbol, data: Array(20000).fill(undefined) }
+  if (!storedLows) storedLows = { symbol, data: Array(20000).fill(undefined) }
+  if (!storedCloses) storedCloses = { symbol, data: Array(20000).fill(undefined) }
 
   for (const price of prices) {
     const index = price.index
-
-    opens.data[index] = price.open
-    highs.data[index] = price.high
-    lows.data[index] = price.low
-    closes.data[index] = price.close
-    volumes.data[index] = price.volume
-    interests.data[index] = price.interest
+    storedOpens.data[index] = price.open
+    storedHighs.data[index] = price.high
+    storedLows.data[index] = price.low
+    storedCloses.data[index] = price.close
   }
 
-  let firstActiveIndex: number | null = null
-  let firstInterDayIndex: number | null = null
-
-  let lastActiveIndex: number | null = null
-
-  let daysSincePrice = 0
-  let timeGapFound = false
-  let dataStarted = false
-  let priceCount = 0
-
-  for (let i = closes.data?.length - 1; i >= 0; i--) {
-    if (timeGapFound === false) {
-      const open = opens.data[i]
-      const close = closes.data[i]
-
-      if (close == null) {
-        daysSincePrice++
-      } else {
-        dataStarted = true
-
-        priceCount++
-
-        if (lastActiveIndex == null) {
-          lastActiveIndex = i
-        }
-
-        if (open != close) {
-          firstInterDayIndex = i
-        }
-        firstActiveIndex = i
-        daysSincePrice = 0
-      }
-
-      if (dataStarted == true && daysSincePrice >= TIMEGAP_CUTOFF) {
-        timeGapFound = true
+  // Volatilities Loading & Merging (directly from the same price CSV)
+  let storedVolatilities = await db.volatilities.get(symbol)
+  
+  if (!storedVolatilities) {
+    storedVolatilities = {
+      symbol,
+      data: {
+        firstActiveIndex: 0,
+        lastActiveIndex: 20000,
+        durations: {}
       }
     }
   }
 
-  const summary = {
-    symbol,
-    priceCount,
-    firstActiveIndex,
-    firstInterDayIndex,
-  }
-  consoleInfo(`ohlcLoadFor: parsed summary:`, summary)
-
-  consoleInfo(`ohlcLoadFor: updating market in db for ${symbol}...`)
-  await marketUpdate(summary)
-
-  consoleInfo(`ohlcLoadFor: fetching volatility file for ${symbol}...`)
-  const volUrl = `/volatilities/${encodeURIComponent(market.symbol.toLowerCase())}.json`
-  let volatilitiesData: any = null
-  try {
-    const volResponse = await fetch(volUrl, {})
-    if (volResponse.ok) {
-      volatilitiesData = await volResponse.json()
-    } else {
-      console.warn(`ohlcLoadFor: volatility fetch failed for ${symbol}: ${volResponse.statusText}`)
+  const durations = [10, 30, 90, 180]
+  for (const duration of durations) {
+    const durationStr = duration.toString()
+    if (!storedVolatilities.data.durations[durationStr]) {
+      storedVolatilities.data.durations[durationStr] = {
+        overnight: Array(20000).fill(null),
+        parkinson: Array(20000).fill(null),
+        rogersSatchell: Array(20000).fill(null),
+        garminKlass: Array(20000).fill(null),
+        yangZhang: Array(20000).fill(null),
+        volatility: Array(20000).fill(null),
+      }
     }
-  } catch (err) {
-    console.error(`ohlcLoadFor: error fetching volatility for ${symbol}:`, err)
+  }
+
+  // Populate volatilities for the current year
+  for (const item of json.data as any[]) {
+    if (!item["date"]) continue
+
+    const date = item["date"]
+    const idx = Math.floor(new Date(date).getTime() / 1000 / 60 / 60 / 24)
+
+    if (idx >= 0 && idx < 20000) {
+      for (const duration of durations) {
+        const durationStr = duration.toString()
+        const targetDur = storedVolatilities.data.durations[durationStr]
+
+        const onVal = parseFloat(item[`volatilityOvernight${durationStr}`])
+        const yzVal = parseFloat(item[`volatilityYangZhang${durationStr}`])
+
+        const overnight = isNaN(onVal) ? null : onVal
+        const yangZhang = isNaN(yzVal) ? null : yzVal
+        const volatility = yangZhang ?? overnight ?? null
+
+        targetDur.overnight[idx] = overnight
+        targetDur.yangZhang[idx] = yangZhang
+        targetDur.volatility[idx] = volatility
+      }
+    }
   }
 
   consoleInfo(`ohlcLoadFor: saving opens/highs/lows/closes/volatilities arrays to db...`)
-  await db.opens.put(opens)
-  await db.highs.put(highs)
-  await db.lows.put(lows)
-  await db.closes.put(closes)
-  if (volatilitiesData != null) {
-    await db.volatilities.put({ symbol, data: volatilitiesData })
+  await db.opens.put(storedOpens)
+  await db.highs.put(storedHighs)
+  await db.lows.put(storedLows)
+  await db.closes.put(storedCloses)
+  if (storedVolatilities != null) {
+    await db.volatilities.put(storedVolatilities)
   }
 
-  db.opensCache = structuredClone(db.opensCache)
-  db.highsCache = structuredClone(db.highsCache)
-  db.lowsCache = structuredClone(db.lowsCache)
-  db.closesCache = structuredClone(db.closesCache)
-  db.volatilitiesCache = structuredClone(db.volatilitiesCache)
-
-  db.opensCache[symbol] = opens.data
-  db.highsCache[symbol] = highs.data
-  db.lowsCache[symbol] = lows.data
-  db.closesCache[symbol] = closes.data
-  if (volatilitiesData != null) {
-    db.volatilitiesCache[symbol] = volatilitiesData
+  // Clone cache structures to trigger React state updates
+  db.opensCache[symbol] = storedOpens.data
+  db.highsCache[symbol] = storedHighs.data
+  db.lowsCache[symbol] = storedLows.data
+  db.closesCache[symbol] = storedCloses.data
+  if (storedVolatilities != null) {
+    db.volatilitiesCache[symbol] = storedVolatilities.data
   }
 
-  consoleInfo(`ohlcLoadFor: data loaded successfully for ${symbol}`)
-  LOADING[symbol] = false
+  // Update market metadata — tighten bounds from actual loaded prices
+  market.loadedYears = [...new Set([...loadedYears, targetYear])]
+  const firstPriceIndex = prices[0]?.index
+  const lastPriceIndex = prices[prices.length - 1]?.index
+  if (firstPriceIndex != null) {
+    market.firstActiveIndex =
+      market.firstActiveIndex == null ? firstPriceIndex : Math.min(market.firstActiveIndex, firstPriceIndex)
+  }
+  if (lastPriceIndex != null) {
+    market.lastActiveIndex =
+      market.lastActiveIndex == null ? lastPriceIndex : Math.max(market.lastActiveIndex, lastPriceIndex)
+  }
+  market.priceCount = (market.priceCount ?? 0) + prices.length
+  await db.markets.put(market)
+
+  consoleInfo(`ohlcLoadFor: data loaded successfully for ${symbol} year ${targetYear}`)
+  LOADING[loadKey] = false
 }
 
-export default function ohlcLoadFor(symbol: string | undefined) {
-  return controller(db, symbol)
+export default function ohlcLoadFor(symbol: string | undefined, year?: number) {
+  return controller(db, symbol, year)
 }

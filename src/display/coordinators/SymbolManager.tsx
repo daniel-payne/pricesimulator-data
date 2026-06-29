@@ -50,8 +50,20 @@ export default function SymbolManager({
   const { view = "contracted", content = "info" } = settings
 
   if (market == null || price == null) {
-    consoleInfo(`SymbolManager: returning null for ${symbol} — market=${JSON.stringify(market)}, price=${JSON.stringify(price)}`)
-    return null
+    consoleInfo(`SymbolManager: showing loading skeleton for ${symbol} — market=${market != null}, price=${price != null}`)
+    return (
+      <div {...rest} data-component={name}>
+        <div className="h-full w-full rounded-xl p-4 bg-base-300 shadow-xl">
+          <div className="h-full w-full flex flex-col gap-2 animate-pulse">
+            <div className="h-5 w-32 rounded bg-base-content/10" />
+            <div className="flex-auto flex flex-col gap-2 justify-center items-center opacity-30">
+              <div className="loading loading-spinner loading-md" />
+              <div className="text-xs text-base-content/50">Loading {symbol}…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

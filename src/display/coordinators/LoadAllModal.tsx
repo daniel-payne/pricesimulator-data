@@ -32,13 +32,6 @@ export default function LoadAllModal({ name = "LoadAllModal", children, ...rest 
     handleCancel()
   }
 
-  useEffect(() => {
-    if (marketsCount != null && loadedMarketsCount != null && marketsCount > 0 && loadedMarketsCount > 1 && marketsCount !== loadedMarketsCount) {
-      setDisabledButton(true)
-
-      ohlcLoadAll()
-    }
-  }, [marketsCount, loadedMarketsCount])
 
   useEffect(() => {
     if (marketsCount === loadedMarketsCount) {

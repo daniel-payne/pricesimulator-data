@@ -11,7 +11,5 @@ export default function useMarkets() {
     return await db.markets?.toArray()
   })
 
-  markets?.sort(compareObjectsBy("name"))
-
-  return markets
+  return markets ? [...markets].sort(compareObjectsBy("name")) : undefined
 }

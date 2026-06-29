@@ -6,11 +6,28 @@ import { controller as recalculateCurrentPrices } from "./recalculateCurrentPric
 import { controller as recalculateCurrentRates } from "./recalculateCurrentRates"
 import { controller as recalculateCurrentMargins } from "./recalculateCurrentMargins"
 import { controller as recalculateCurrentVolatilities } from "./recalculateCurrentVolatilities"
+import { controller as getTimer } from "./getTimer"
+import { controller as ohlcLoadFor } from "./ohlcLoadFor"
 
 import closeAllTrades from "./closeAllTrades"
 import closeExpiringTrades from "./closeExpiringTrades"
 
 export async function controller(db: PriceSimulatorDexie) {
+  const timer = await getTimer(db)
+  const currentIndex = timer?.currentIndex
+
+  if (currentIndex != null) {
+    const currentYear = new Date(currentIndex * 86400000).getUTCFullYear()
+    const activeSymbols = timer.activeSymbols ?? []
+    for (const symbol of activeSymbols) {
+      const market = await db.markets.get(symbol)
+      const loadedYears = market?.loadedYears ?? []
+      if (market && !loadedYears.includes(currentYear)) {
+        await ohlcLoadFor(db, symbol, currentYear)
+      }
+    }
+  }
+
   await recalculateCurrentPrices(db)
   await recalculateCurrentVolatilities(db)
   await recalculateCurrentRates(db)
