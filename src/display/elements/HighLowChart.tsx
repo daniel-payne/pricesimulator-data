@@ -99,22 +99,66 @@ export default function HighLowChart({
     dataStart = clampedFirstActive
   }
 
-  const displayHighs = (highs?.slice(dataStart, endDataIndex + 1) ?? []).map((v) => v)
-  const displayLows = (lows?.slice(dataStart, endDataIndex + 1) ?? []).map((v) => v)
-  const displayCloses = (closes?.slice(dataStart, endDataIndex + 1) ?? []).map((v) => v)
+  // --- Calculate visible window BEFORE slicing so we only create the data we need ---
+  // This is critical: category scales spread all data points evenly across the full chart
+  // width regardless of x-axis min/max, so we must pre-clip the data to the visible range.
+  const nextActiveTrade = activeTrades?.[0]
+  const endIndex = nextActiveTrade?.expiryIndex ?? price?.currentIndex ?? 0
 
-  if (!isMarketClosed && displayHighs.length > 0) {
-    displayHighs[displayHighs.length - 1] = null
-    displayLows[displayLows.length - 1] = null
-    displayCloses[displayCloses.length - 1] = currentOpen
+  let startIndex = nextActiveTrade?.entryIndex ?? endDataIndex
+
+  if (range === "1m") {
+    startIndex = startIndex - 1 * 30
+  } else if (range === "3m") {
+    startIndex = startIndex - 3 * 30
+  } else if (range === "1y") {
+    startIndex = startIndex - 1 * 365
+  } else if (range === "5y") {
+    startIndex = startIndex - 5 * 365
+  } else if (range === "at") {
+    startIndex = dataStart
+  }
+
+  // Never start before the first bar with real spread
+  if (startIndex < dataStart) {
+    startIndex = dataStart
+  }
+
+  // When market is open with no active trade, today would land at the very
+  // right edge — add padding so the pricePoint/openLine are visible inside the chart
+  const rightPad = !isMarketClosed && nextActiveTrade == null ? 2 : 0
+  const sliceEnd = endDataIndex + rightPad
+
+  // Slice only the visible window (padding days will be null/undefined)
+  const sliceStart = startIndex
+  const displayHighs = (highs?.slice(sliceStart, sliceEnd + 1) ?? []).map((v) => v)
+  const displayLows = (lows?.slice(sliceStart, sliceEnd + 1) ?? []).map((v) => v)
+  const displayCloses = (closes?.slice(sliceStart, sliceEnd + 1) ?? []).map((v) => v)
+
+  // Mask TODAY and all future padding positions.
+  // The full-year CSV is pre-loaded so padding slots contain real future prices — null them all.
+  if (!isMarketClosed && currentIndex != null) {
+    const todayPos = currentIndex - sliceStart
+    if (todayPos >= 0 && todayPos < displayHighs.length) {
+      // Today: mask high/low, keep open for the connecting line source
+      displayHighs[todayPos] = null
+      displayLows[todayPos] = null
+      displayCloses[todayPos] = currentOpen ?? null
+      // Future padding days: null everything
+      for (let i = todayPos + 1; i < displayHighs.length; i++) {
+        displayHighs[i] = null
+        displayLows[i] = null
+        displayCloses[i] = null
+      }
+    }
   }
 
   // Labels are global day-indices so trade annotations keep their correct positions
-  const labels = displayHighs.map((_, i) => dataStart + i)
+  const labels = displayHighs.map((_, i) => sliceStart + i)
 
   const datasets = [] as any
 
-  const nextActiveTrade = activeTrades?.[0]
+  // nextActiveTrade already computed above
 
   let fillTo = 1
 
@@ -123,7 +167,10 @@ export default function HighLowChart({
       type: "line",
       label: "closes",
       data: displayCloses,
-      pointRadius: displayCloses.map((_, i) => (i === displayCloses.length - 1 && !isMarketClosed) ? 0 : 4),
+      pointRadius: displayCloses.map((_, i) => {
+        const globalIdx = sliceStart + i
+        return (globalIdx === currentIndex && !isMarketClosed) ? 0 : 4
+      }),
       borderWidth: 0,
       fill: false,
       //borderColor: cssVar("--graph-point"),
@@ -191,25 +238,7 @@ export default function HighLowChart({
     spanGaps: true,
   })
 
-  let startIndex = nextActiveTrade?.entryIndex ?? endDataIndex
-  let endIndex = nextActiveTrade?.expiryIndex ?? price?.currentIndex ?? 0
-
-  if (range === "1m") {
-    startIndex = startIndex - 1 * 30
-  } else if (range === "3m") {
-    startIndex = startIndex - 3 * 30
-  } else if (range === "1y") {
-    startIndex = startIndex - 1 * 365
-  } else if (range === "5y") {
-    startIndex = startIndex - 5 * 365
-  } else if (range === "at") {
-    startIndex = dataStart
-  }
-
-  // Never start before the first bar with real spread
-  if (startIndex < dataStart) {
-    startIndex = dataStart
-  }
+  // startIndex / endIndex already computed above before slicing
 
   let pricePointValue
   let pricePointIndex
@@ -260,8 +289,6 @@ export default function HighLowChart({
 
       x: {
         display: false,
-        min: startIndex,
-        max: nextActiveTrade?.expiryIndex ?? endIndex,
       },
     },
     plugins: {
@@ -283,19 +310,7 @@ export default function HighLowChart({
             yMax: pricePointValue,
             borderColor: pricePointColor,
             borderWidth: 1,
-            display: true,
-          },
-          pricePoint: {
-            type: "point",
-            xScaleID: "x",
-            yScaleID: "y",
-            pointStyle: isMarketClosed ? "circle" : "rect",
-            radius: isMarketClosed ? 4 : 6,
-            yValue: pricePointValue,
-            xValue: pricePointIndex,
-            borderColor: pricePointColor,
-            backgroundColor: pricePointColor,
-            borderWidth: 1,
+            adjustScaleRange: false,
             display: true,
           },
         },
@@ -429,29 +444,46 @@ export default function HighLowChart({
     }
   }
 
+  // Draw the open-day segment and price dot as datasets (avoids annotation scale-lookup issues)
   if (!isMarketClosed && currentIndex != null && priorIndex != null && priorClose != null && currentOpen != null) {
-    options.plugins.annotation.annotations[`openLine`] = {
+    // Grey connecting line from yesterday's close to today's open
+    const openLineData = labels.map((lbl) => {
+      if (lbl === priorIndex) return priorClose
+      if (lbl === currentIndex) return currentOpen
+      return null
+    })
+    datasets.push({
       type: "line",
-      xScaleID: "x",
-      yScaleID: "y",
-      xMin: priorIndex,
-      xMax: currentIndex,
-      yMin: priorClose,
-      yMax: currentOpen,
+      label: "openLine",
+      data: openLineData,
+      pointRadius: 0,
       borderColor: cssVar("--graph-range"),
       borderWidth: 6,
-      adjustScaleRange: false,
-      display: true,
-    }
+      fill: false,
+      spanGaps: true,
+      tension: 0,
+    })
+
+    // Coloured square dot at today's open
+    const pricePointData = labels.map((lbl) => (lbl === currentIndex ? currentOpen : null))
+    datasets.push({
+      type: "line",
+      label: "pricePointDot",
+      data: pricePointData,
+      pointRadius: labels.map((lbl) => (lbl === currentIndex ? 10 : 0)),
+      pointStyle: "rect",
+      backgroundColor: pricePointColor,
+      borderColor: pricePointColor,
+      borderWidth: 2,
+      fill: false,
+      spanGaps: false,
+    })
   }
 
   return (
     <div {...rest} data-component={name}>
       <div style={{ position: "relative", margin: "auto", width: "99%", height: "99%" }}>
         <Multi datasetIdKey="id" type="line" data={{ labels, datasets }} options={options} />
-        <div style={{ position: "absolute", top: 10, right: 80, background: "rgba(0,0,0,0.85)", color: "#fff", padding: "6px 10px", fontSize: 11, zIndex: 9999, borderRadius: 4, fontFamily: "monospace" }}>
-          {`Closed:${isMarketClosed} Cur:${currentIndex} Prior:${priorIndex} pClose:${priorClose} cOpen:${currentOpen} Labels:${labels.length}`}
-        </div>
       </div>
     </div>
   )
