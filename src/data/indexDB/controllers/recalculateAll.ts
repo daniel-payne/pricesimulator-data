@@ -20,10 +20,16 @@ export async function controller(db: PriceSimulatorDexie) {
     const currentYear = new Date(currentIndex * 86400000).getUTCFullYear()
     const activeSymbols = timer.activeSymbols ?? []
     for (const symbol of activeSymbols) {
-      const market = await db.markets.get(symbol)
-      const loadedYears = market?.loadedYears ?? []
-      if (market && !loadedYears.includes(currentYear)) {
-        await ohlcLoadFor(db, symbol, currentYear)
+      let market = await db.markets.get(symbol)
+      if (!market) continue
+
+      for (let y = 1970; y <= currentYear; y++) {
+        const loadedYears = market?.loadedYears ?? []
+        if (!loadedYears.includes(y)) {
+          await ohlcLoadFor(db, symbol, y)
+          // Refresh local reference after loading a year to get updated loadedYears
+          market = await db.markets.get(symbol)
+        }
       }
     }
   }

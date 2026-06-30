@@ -313,8 +313,8 @@ export default function ActionsPage({ name = "ActionsPage", ...rest }: PropsWith
               Stop
             </button>
 
-            <button className="btn btn-sm btn-secondary" onClick={() => timerReset("1970-01-05")}>
-              Reset 1970
+            <button className="btn btn-sm btn-secondary" onClick={() => timerReset("1971-06-14")}>
+              Reset 1971
             </button>
             <button className="btn btn-sm btn-secondary" onClick={() => timerReset("2000-01-09")}>
               Reset 2000

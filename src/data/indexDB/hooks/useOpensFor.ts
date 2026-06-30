@@ -8,13 +8,6 @@ import consoleInfo from "@/utilities/consoleInfo"
 
 export default function useOpensFor(symbol: string) {
   const data = useLiveQuery(async () => {
-    const cached = db.opensCache[symbol]
-
-    if ((cached?.length ?? 0) > 0) {
-      consoleInfo(`useOpensFor ${symbol} : cached`)
-      return cached
-    }
-
     const stored = await db.opens.where({ symbol }).first()
 
     db.opensCache[symbol] = stored?.data

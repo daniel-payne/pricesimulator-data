@@ -8,13 +8,6 @@ import consoleInfo from "@/utilities/consoleInfo"
 
 export default function useLowsFor(symbol = "MISSING") {
   const data = useLiveQuery(async () => {
-    const cached = db.lowsCache[symbol]
-
-    if ((cached?.length ?? 0) > 0) {
-      consoleInfo(`useLowsFor ${symbol} : cached`)
-      return cached
-    }
-
     const stored = await db.lows.where({ symbol }).first()
 
     db.lowsCache[symbol] = stored?.data

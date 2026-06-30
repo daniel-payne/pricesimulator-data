@@ -32,10 +32,6 @@ const CACHE = {} as Record<string, SymbolData>
 
 export default function useMarketLowsForSymbol(symbol: string | undefined | null = "NO-MATCH"): SymbolData | undefined {
   const market = useLiveQuery(async () => {
-    if (symbol != null && CACHE[symbol]) {
-      return CACHE[symbol]
-    }
-
     const result = await db.marketLows?.where({ symbol }).first()
 
     if (symbol != null && result != null) {

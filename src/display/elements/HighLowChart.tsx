@@ -99,9 +99,15 @@ export default function HighLowChart({
     dataStart = clampedFirstActive
   }
 
-  const displayHighs = highs?.slice(dataStart, endDataIndex + 1) ?? []
-  const displayLows = lows?.slice(dataStart, endDataIndex + 1) ?? []
-  const displayCloses = closes?.slice(dataStart, endDataIndex + 1) ?? []
+  const displayHighs = (highs?.slice(dataStart, endDataIndex + 1) ?? []).map((v) => v)
+  const displayLows = (lows?.slice(dataStart, endDataIndex + 1) ?? []).map((v) => v)
+  const displayCloses = (closes?.slice(dataStart, endDataIndex + 1) ?? []).map((v) => v)
+
+  if (!isMarketClosed && displayHighs.length > 0) {
+    displayHighs[displayHighs.length - 1] = null
+    displayLows[displayLows.length - 1] = null
+    displayCloses[displayCloses.length - 1] = currentOpen
+  }
 
   // Labels are global day-indices so trade annotations keep their correct positions
   const labels = displayHighs.map((_, i) => dataStart + i)
@@ -117,7 +123,7 @@ export default function HighLowChart({
       type: "line",
       label: "closes",
       data: displayCloses,
-      pointRadius: 4,
+      pointRadius: displayCloses.map((_, i) => (i === displayCloses.length - 1 && !isMarketClosed) ? 0 : 4),
       borderWidth: 0,
       fill: false,
       //borderColor: cssVar("--graph-point"),
@@ -186,7 +192,7 @@ export default function HighLowChart({
   })
 
   let startIndex = nextActiveTrade?.entryIndex ?? endDataIndex
-  let endIndex = (nextActiveTrade?.expiryIndex ?? price?.currentIndex ?? 0) + 1
+  let endIndex = nextActiveTrade?.expiryIndex ?? price?.currentIndex ?? 0
 
   if (range === "1m") {
     startIndex = startIndex - 1 * 30
@@ -222,12 +228,10 @@ export default function HighLowChart({
   } else {
     pricePointValue = currentOpen
     pricePointIndex = currentIndex
-    if ((currentOpen ?? 0) > (priorClose ?? 0)) {
+    if ((currentOpen ?? 0) >= (priorClose ?? 0)) {
       pricePointColor = cssVar("--outcome-profit-50")
-    } else if ((currentOpen ?? 0) < (priorClose ?? 0)) {
-      pricePointColor = cssVar("--outcome-loss-50")
     } else {
-      pricePointColor = cssVar("--outcome-neutral-50")
+      pricePointColor = cssVar("--outcome-loss-50")
     }
   }
 
@@ -274,6 +278,7 @@ export default function HighLowChart({
         annotations: {
           priceLine: {
             type: "line",
+            yScaleID: "y",
             yMin: pricePointValue,
             yMax: pricePointValue,
             borderColor: pricePointColor,
@@ -282,7 +287,10 @@ export default function HighLowChart({
           },
           pricePoint: {
             type: "point",
-            radius: 4,
+            xScaleID: "x",
+            yScaleID: "y",
+            pointStyle: isMarketClosed ? "circle" : "rect",
+            radius: isMarketClosed ? 4 : 6,
             yValue: pricePointValue,
             xValue: pricePointIndex,
             borderColor: pricePointColor,
@@ -290,37 +298,25 @@ export default function HighLowChart({
             borderWidth: 1,
             display: true,
           },
-          // firstProfit: {
-          //   type: "line",
-          //   borderWidth: 12,
-          //   yMin: firstTrade?.entryPrice,
-          //   yMax: (firstTrade?.entryPrice ?? 0) * 10,
-          //   xMin: firstTrade?.expiryIndex,
-          //   xMax: firstTrade?.expiryIndex,
-          //   borderColor: cssVar("--outcome-profit-25"),
-          //   backgroundColor: cssVar("--outcome-profit-25"),
-          //   adjustScaleRange: false,
-          //   display: true,
-          // },
-          // firstLoss: {
-          //   type: "line",
-          //   borderWidth: 12,
-          //   yMin: 0,
-          //   yMax: firstTrade?.entryPrice ?? 0,
-          //   xMin: firstTrade?.expiryIndex,
-          //   xMax: firstTrade?.expiryIndex,
-          //   borderColor: cssVar("--outcome-loss-25"),
-          //   backgroundColor: cssVar("--outcome-loss-25"),
-          //   adjustScaleRange: false,
-          //   display: true,
-          // },
         },
       },
     },
   } as any
 
+  const maxIndex = nextActiveTrade?.expiryIndex ?? endIndex
+
   for (const activeTrade of activeTrades ?? []) {
     if (activeTrade?.entryPrice != null) {
+      const entryIndex = activeTrade.entryIndex
+      const expiryIndex = activeTrade.expiryIndex
+      if (entryIndex == null || expiryIndex == null) {
+        continue
+      }
+      const isVisible = entryIndex <= maxIndex && expiryIndex >= startIndex
+      if (!isVisible) {
+        continue
+      }
+
       let minLossPoint = activeTrade.direction === "CALL" ? 0 : activeTrade.entryPrice * 100
       let maxLossPoint = activeTrade.direction === "CALL" ? activeTrade.entryPrice : 0
 
@@ -329,6 +325,8 @@ export default function HighLowChart({
 
       const firstTradeLoss = {
         type: "line",
+        xScaleID: "x",
+        yScaleID: "y",
         borderWidth: 12,
         yMin: minLossPoint,
         yMax: maxLossPoint,
@@ -342,6 +340,8 @@ export default function HighLowChart({
 
       const firstTradeProfit = {
         type: "line",
+        xScaleID: "x",
+        yScaleID: "y",
         borderWidth: 12,
         yMin: minProfitPoint,
         yMax: maxProfitPoint,
@@ -360,11 +360,16 @@ export default function HighLowChart({
 
   for (const trade of inactiveTrades ?? []) {
     if (trade?.entryPrice != null) {
-      // let minLossPoint = trade.direction === "CALL" ? 0 : trade.entryPrice * 100
-      // let maxLossPoint = trade.direction === "CALL" ? trade.entryPrice : 0
+      const entryIndex = trade.entryIndex
+      const tradeEndIndex = trade.exitIndex ?? trade.expiryIndex ?? entryIndex
+      if (entryIndex == null || tradeEndIndex == null) {
+        continue
+      }
+      const isVisible = entryIndex <= maxIndex && tradeEndIndex >= startIndex
+      if (!isVisible) {
+        continue
+      }
 
-      // let minProfitPoint = trade.direction === "CALL" ? trade.entryPrice : trade.entryPrice
-      // let maxProfitPoint = trade.direction === "CALL" ? trade.entryPrice * 1000 : 0
       const isInProfit = (trade.profit ?? 0) > 0
 
       const lineColor = isInProfit ? "--outcome-profit-25" : "--outcome-loss-25"
@@ -372,6 +377,8 @@ export default function HighLowChart({
 
       const entryPoint = {
         type: "point",
+        xScaleID: "x",
+        yScaleID: "y",
         borderWidth: 2,
 
         yValue: trade?.entryPrice,
@@ -385,6 +392,8 @@ export default function HighLowChart({
 
       const exitPoint = {
         type: "point",
+        xScaleID: "x",
+        yScaleID: "y",
         borderWidth: 2,
 
         yValue: trade?.exitPrice,
@@ -398,6 +407,8 @@ export default function HighLowChart({
 
       const marginLine = {
         type: "line",
+        xScaleID: "x",
+        yScaleID: "y",
         borderWidth: 6,
 
         yMin: trade?.entryPrice,
@@ -412,23 +423,25 @@ export default function HighLowChart({
         display: true,
       }
 
-      // const firstTradeProfit = {
-      //   type: "line",
-      //   borderWidth: 20,
-
-      //   yValue: trade?.entryValue,
-      //   xValue: trade?.entryIndex,
-
-      //   borderColor: cssVar("--outcome-profit-25"),
-      //   backgroundColor: cssVar("--outcome-profit-25"),
-      //   adjustScaleRange: false,
-      //   display: true,
-      // }
-
       options.plugins.annotation.annotations[`entryPoint-${trade.id}`] = entryPoint
       options.plugins.annotation.annotations[`exitPoint-${trade.id}`] = exitPoint
       options.plugins.annotation.annotations[`marginLine-${trade.id}`] = marginLine
-      // options.plugins.annotation.annotations[`inactive-profit-${trade.id}`] = firstTradeProfit
+    }
+  }
+
+  if (!isMarketClosed && currentIndex != null && priorIndex != null && priorClose != null && currentOpen != null) {
+    options.plugins.annotation.annotations[`openLine`] = {
+      type: "line",
+      xScaleID: "x",
+      yScaleID: "y",
+      xMin: priorIndex,
+      xMax: currentIndex,
+      yMin: priorClose,
+      yMax: currentOpen,
+      borderColor: cssVar("--graph-range"),
+      borderWidth: 6,
+      adjustScaleRange: false,
+      display: true,
     }
   }
 
@@ -436,6 +449,9 @@ export default function HighLowChart({
     <div {...rest} data-component={name}>
       <div style={{ position: "relative", margin: "auto", width: "99%", height: "99%" }}>
         <Multi datasetIdKey="id" type="line" data={{ labels, datasets }} options={options} />
+        <div style={{ position: "absolute", top: 10, right: 80, background: "rgba(0,0,0,0.85)", color: "#fff", padding: "6px 10px", fontSize: 11, zIndex: 9999, borderRadius: 4, fontFamily: "monospace" }}>
+          {`Closed:${isMarketClosed} Cur:${currentIndex} Prior:${priorIndex} pClose:${priorClose} cOpen:${currentOpen} Labels:${labels.length}`}
+        </div>
       </div>
     </div>
   )

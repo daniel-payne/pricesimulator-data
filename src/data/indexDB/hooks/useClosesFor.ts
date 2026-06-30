@@ -21,13 +21,6 @@ export default function useClosesFor(symbol = "MISSING") {
       }
     }
 
-    const cached = db.closesCache[symbol]
-
-    if ((cached?.length ?? 0) > 0) {
-      consoleInfo(`useClosesFor ${symbol} : cached`)
-      return cached
-    }
-
     const stored = await db.closes.where({ symbol }).first()
 
     db.closesCache[symbol] = stored?.data

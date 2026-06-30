@@ -19,6 +19,10 @@ export default function extractPriceForIndex(
 
   spread: number = DEFAULT_SPREAD
 ) {
+  if (opens == null || highs == null || lows == null || closes == null) {
+    return
+  }
+
   const indexEnd = opens.length - 1
 
   if (currentIndex > indexEnd) {

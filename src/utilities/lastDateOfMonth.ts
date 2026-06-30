@@ -1,13 +1,15 @@
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
 function getLastDayOccurrence(date: Date, day: string) {
-  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+  // Create a UTC Date representing the last day of the month
+  const lastDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0))
 
   const d = new Date(lastDay.getTime())
 
   if (DAYS.includes(day)) {
-    const modifier = (d.getDay() + DAYS.length - DAYS.indexOf(day)) % 7 || 7
-    d.setDate(d.getDate() - modifier)
+    const targetIndex = DAYS.indexOf(day)
+    const modifier = (d.getUTCDay() + 7 - targetIndex) % 7
+    d.setUTCDate(d.getUTCDate() - modifier)
   }
 
   return d
@@ -18,9 +20,18 @@ export default function lastDateOfMonth(currentDate: number | Date | string | nu
     return undefined
   }
 
-  const futureDate = new Date(currentDate)
+  let futureDate: Date
+  if (typeof currentDate === "number") {
+    futureDate = new Date(currentDate * 86400000)
+  } else if (typeof currentDate === "string") {
+    futureDate = new Date(currentDate)
+  } else {
+    futureDate = new Date(currentDate.getTime())
+  }
 
-  futureDate.setMonth(futureDate.getMonth() + addMonths)
+  // Set day to 1 before adding months to prevent date overflow (e.g. Jan 31 + 1 month skipping to March)
+  futureDate.setUTCDate(1)
+  futureDate.setUTCMonth(futureDate.getUTCMonth() + addMonths)
 
   return getLastDayOccurrence(futureDate, dayOfWeek)
 }

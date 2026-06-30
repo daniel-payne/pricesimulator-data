@@ -1,4 +1,4 @@
 ref,name,description,displayOrder,symbols,settings
 one,Buy and sell cows,"Sell something you don""t own and buy something you don""t want to keep",1,LC.F,"{""view"": ""expanded"",""content"": ""both"",""behaviors"": ""off"",""actions"": ""off"",""trade"": ""contract"",""showMultiples"": false,""showDescription"": true}"
 two,Trade in more markets,"You can trade more than one market, and you don't even need to buy a whole contract",2,"GBPUSD","{""view"": ""expanded"",""content"": ""both"",""behaviors"": ""off"",""actions"": ""off"",""trade"": ""contract"",""showMultiples"": true,""showDescription"": true}"
-three,Trade in lots markets,Practice trading your contracts in lots of different markets.,3,"KC.F,CC.F,LH.F,W.F","{""view"": ""expanded"",""content"": ""chart"",""behaviors"": ""off"",""actions"": ""on"",""trade"": ""contract"",""showMultiples"": true,""showDescription"": true}"
+three,Trade in lots markets,Practice trading your contracts in lots of different markets.,3,"OJ.F,CC.F,LH.F,W.F","{""view"": ""expanded"",""content"": ""chart"",""behaviors"": ""off"",""actions"": ""on"",""trade"": ""contract"",""showMultiples"": true,""showDescription"": true}"

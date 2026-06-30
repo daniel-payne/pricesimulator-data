@@ -23,9 +23,22 @@ export async function controller(db: PriceSimulatorDexie, symbols: string[]) {
   const currentIndex = timer?.currentIndex ?? DEFAULT_START
   const year = new Date(currentIndex * 86400000).getUTCFullYear()
 
-  consoleInfo(`preloadScenarioPrices: loading year ${year} for ${trimmedSymbols.length} symbol(s)`)
-  for (const symbol of trimmedSymbols) {
-    await ohlcLoadFor(db, symbol, year)
+  // Always ensure 1970 is loaded first (baseline year), then load the current year
+  // Symbols are processed in ticker (alphabetical) order
+  const sortedSymbols = [...trimmedSymbols].sort((a, b) => a.localeCompare(b))
+
+  consoleInfo(`preloadScenarioPrices: loading 1970 baseline for ${sortedSymbols.length} symbol(s) (ticker order)`)
+  for (const symbol of sortedSymbols) {
+    await ohlcLoadFor(db, symbol, 1970)
+  }
+
+  if (year > 1970) {
+    consoleInfo(`preloadScenarioPrices: loading years 1971 to ${year} for ${sortedSymbols.length} symbol(s) (ticker order)`)
+    for (let y = 1971; y <= year; y++) {
+      for (const symbol of sortedSymbols) {
+        await ohlcLoadFor(db, symbol, y)
+      }
+    }
   }
 
   consoleInfo("preloadScenarioPrices: recalculating prices")

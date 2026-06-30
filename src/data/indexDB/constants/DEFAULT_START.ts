@@ -1,1 +1,1 @@
-export const DEFAULT_START = 183 // 1970-07-03
+export const DEFAULT_START = 529 // 1971-06-14 (second Monday of June 1971)

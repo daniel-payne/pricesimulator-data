@@ -22,6 +22,7 @@ export default function ResetModal({ name = "ResetModal", children, ...rest }: P
     await clearUserData()
 
     handleCancel()
+    window.location.assign("/")
   }
 
   return (

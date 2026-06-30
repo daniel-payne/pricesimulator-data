@@ -68,9 +68,11 @@ export default function HomePage({ name = "HomePage", ...rest }: PropsWithChildr
   }
 
   useEffect(() => {
-    navigator.storage.estimate().then((estimate) => {
-      setStorageEstimate(estimate)
-    })
+    if (navigator.storage?.estimate != null) {
+      navigator.storage.estimate().then((estimate) => {
+        setStorageEstimate(estimate)
+      })
+    }
   }, [loadedMarketsCount])
 
   return (
@@ -181,8 +183,14 @@ export default function HomePage({ name = "HomePage", ...rest }: PropsWithChildr
               <div>There are no GDPR wavers as we don't use cookies, once loaded, the game runs locally.</div>
               <div className="font-light leading-none tracking-tight text-gray-500">
                 <span className="text-sm opacity-50">
-                  The game is currently using {formatNumber((storageEstimate?.usage ?? 0) / 1000000, 0)} MB of the available space (
-                  {formatNumber((storageEstimate?.quota ?? 0) / 1000000, 0)} MB) : click
+                  {storageEstimate != null ? (
+                    <>
+                      The game is currently using {formatNumber((storageEstimate.usage ?? 0) / 1000000, 0)} MB of the available space (
+                      {formatNumber((storageEstimate.quota ?? 0) / 1000000, 0)} MB) : click
+                    </>
+                  ) : (
+                    <>Click </>
+                  )}
                   <span className="text-error cursor-pointer px-2 " onClick={handleShowDeleteAllModal}>
                     here
                   </span>

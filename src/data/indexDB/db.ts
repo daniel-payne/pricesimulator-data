@@ -165,6 +165,10 @@ export class PriceSimulatorDexie extends Dexie {
       volatilities: "symbol",
     })
 
+    this.version(14).stores({
+      scenarios: "ref, name, displayOrder",
+    })
+
     this.guid = generateID()
   }
 }
